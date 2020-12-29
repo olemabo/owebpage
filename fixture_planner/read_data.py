@@ -1,5 +1,4 @@
 import json
-import numpy as np
 import pandas as pd
 import math
 
@@ -54,18 +53,19 @@ class Fixtures:
             for j in range(len(home_matches)):
                 home, away = home_matches.iloc[j]['gameweek'], away_matches.iloc[j]['gameweek']
                 if math.isnan(home):
-                    home_matches.at[home_matches.iloc[j].name, ['gameweek', 'difficulty']] = min(
-                        home_matches.iloc[j + 1]['gameweek'], away) - 1, 0
+                    #home_matches.at[home_matches.iloc[j].name, ['gameweek', 'difficulty']] = min(
+                    #    home_matches.iloc[j + 1]['gameweek'], away) - 1, 0
+                    home_matches.at[home_matches.iloc[j].name, ['gameweek']] = 0
 
                 if math.isnan(away):
-                    away_matches.at[away_matches.iloc[j].name, ['gameweek', 'difficulty']] = min(
-                        away_matches.iloc[j + 1]['gameweek'], home) - 1, 0
+                    #away_matches.at[away_matches.iloc[j].name, ['gameweek', 'difficulty']] = min(
+                    #    away_matches.iloc[j + 1]['gameweek'], home) - 1, 0
+                    away_matches.at[away_matches.iloc[j].name, ['gameweek']] = 0
 
             temp = temp.append(home_matches[final_features])
             temp = temp.append(away_matches[final_features])
             temp = temp.sort_values('gameweek', ascending=True)
             self.list_teams.append(temp)
-
 
 class Players:
     """
@@ -165,7 +165,6 @@ def create_data_frame():
 
     """
     static, fixture = get_json()
-
     team_list = create_team_list()
     number_of_PL_teams = len(team_list)
     columns = [str(i) for i in range(0, len(team_list[0].fixtures_df.index) + 1)]
@@ -182,11 +181,12 @@ def create_data_frame():
             index_opp = team_info.fixtures_df['opponent_team'].index[team_idx]
             index_ah = team_info.fixtures_df['H/A'].index[team_idx]
             index_diff = team_info.fixtures_df['difficulty'].index[team_idx]
+            index_gw = team_info.fixtures_df['gameweek'].index[team_idx]
             opp = team_info.fixtures_df['opponent_team'][index_opp]
             ah = team_info.fixtures_df['H/A'][index_ah]
             diff = team_info.fixtures_df['difficulty'][index_diff]
-
-            temp_data.append([dict_team_id_to_name[opp], ah, diff])
+            gw = team_info.fixtures_df['gameweek'][index_gw]
+            temp_data.append([dict_team_id_to_name[opp], ah, diff, int(gw)])
         data.append(temp_data)
     return pd.DataFrame(data=data, columns=columns)
 
@@ -200,9 +200,5 @@ def return_fixture_names_shortnames():
     return df, names, short_names, ids
 
 
+return_fixture_names_shortnames()
 
-def fill_database():
-    df, names, short_names, ids = return_fixture_names_shortnames()
-    fill_model = AddPlTeamsToDB(name=names[0])
-
-# fill_database()

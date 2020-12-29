@@ -25,5 +25,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('contact/', include('contact.urls')),
     path('catalog/', include('catalog.urls')),
+    path('statistics/', include('statistic.urls')),
     path('fixture-planner/', include('fixture_planner.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

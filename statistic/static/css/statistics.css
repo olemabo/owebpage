@@ -1,0 +1,80 @@
+
+body {
+  background: #EEE;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+p {
+    text-align: center;
+}
+
+.info-container {
+    margin: 0 auto;
+    min-width: 400px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: flex-start;
+    background-color: white;
+    flex-wrap: wrap;
+
+}
+
+.choice-container {
+    margin: 0 auto;
+    min-width: 400px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: flex-start;
+    background-color: white;
+    flex-wrap: wrap;
+    padding-bottom: 7px;
+    padding-top: 7px;
+}
+
+p {
+    background-color: red;
+}
+
+.img {
+    height: 550px;
+}
+
+.big-container {
+    max-width: 1200px;
+}
+
+.image-nationality {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+input {
+    text-align: left;
+}
+
+.input-ownership-nationality {
+    width: 120px;
+}
+
+.input-top-x {
+    width: 70px;
+}
+
+.input-gw {
+    width: 50px;
+}
+
+.text-center {
+    text-align: center;
+}
+

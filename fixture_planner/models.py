@@ -19,6 +19,7 @@ class AddPlTeamsToDB(models.Model):
     team_id = models.IntegerField(primary_key=True, help_text='Enter team id (1) ')
     team_short_name = models.CharField(max_length=3, help_text='Enter team name short (ARS)')
     date = models.DateField(default=date.today(), help_text='Date entered into database')
+
     oppTeamNameList = ListTextField(
         base_field=models.CharField(max_length=3, help_text='Enter team name short (ARS)'),
         size=38,  # Maximum of 100 ids in list
@@ -31,6 +32,11 @@ class AddPlTeamsToDB(models.Model):
 
     oppTeamDifficultyScore = ListTextField(
         base_field=models.IntegerField(help_text='1-5'),
+        size=38,  # Maximum of 100 ids in list
+    )
+
+    gw = ListTextField(
+        base_field=models.IntegerField(help_text='1-38'),
         size=38,  # Maximum of 100 ids in list
     )
 
@@ -48,6 +54,10 @@ class AddPlTeamsToDB(models.Model):
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return f'{self.team_name}, {self.team_id}'
+
+
+
+
 
 
 def fill_database():

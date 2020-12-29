@@ -16,11 +16,13 @@
     <img class="header" src="{% static '/images/FPL-Statement-Lead.png' %}" alt="Top Image">
  </div>
  <div id="tops" class="top-nav">
-     <a class="btn active" href=../home/>Home</a>
-     <a class="btn" href=../fixture-planner/>Fixture Planner</a>
-     <a class="btn" href=../catalog/>Catalog</a>
-     <a class="btn" href=../contact/>Contact</a>
-     <a class="btn" href=../admin/>Admin</a>
+     <a class="btn active" href=../../../home/>Home</a>
+     <a class="btn" href=../../../fixture-planner/>Fixture Planner</a>
+     <a class="btn" href=../../../statistics/>Statistics</a>
+     <a class="btn" href=../../../catalog/>Catalog</a>
+     <a class="btn" href=../../../contact/>Contact</a>
+     <a class="btn" href=../../../admin/>Admin</a>
+     <!--DROPDOWN MENU: https://www.w3schools.com/css/tryit.asp?filename=trycss_dropdown_navbar -->
 </div>
 
  <script>
@@ -39,8 +41,8 @@ for (var i = 0; i < btns.length; i++) {
   });
 }
    </script>
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid" style="flex-wrap: wrap;">
+    <div class="row" style="width: 90%; justify-content: center;">
       <!-- SIDEBAR div class="col-sm-2">
       {% block sidebar %}
         <ul class="sidebar-nav">
@@ -51,7 +53,7 @@ for (var i = 0; i < btns.length; i++) {
         </ul>
      {% endblock %}
       </div -->
-      <div class="col-sm-10 ">{% block content %}{% endblock %}</div>
+      <div class="col-sm-10">{% block content %}{% endblock %}</div>
     </div>
   </div>
     <footer>

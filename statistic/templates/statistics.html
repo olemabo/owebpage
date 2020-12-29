@@ -1,0 +1,75 @@
+{% extends "index_home.html" %}
+
+{% block content %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/statistics.css' %}">
+<script type="text/javascript" src="{% static 'js/fixture_planner.js' %}"></script>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#button').click(function(e) {
+        var gw = $("#gw").val();
+        var top_x = $("#top_x").val();
+        ownership_vs_nationality = $("#ownership_vs_nationality").val();
+        window.location.replace(" http://127.0.0.1:8000/statistics/" + ownership_vs_nationality + "/" + top_x + "/" + gw);
+    });
+});
+</script>
+
+<h2>
+    FPL Statistics
+</h2>
+
+<div class="big-container">
+
+    <div class="info-container">
+        <div class="info-box">
+            This page will show statistics regarding top x fpl managers.
+        </div>
+    </div>
+
+    <div class="choice-container text-center top-bottom-space">
+        <label for="ownership_vs_nationality">Ownership/Nationality: &nbsp</label>
+
+        <select name="pets" id="ownership_vs_nationality">
+            {% if ownership_vs_nationality == "nationality" %}
+            <option value="nationality">Nationality</option>
+            <option value="ownership">Ownership</option>
+            {% else %}
+            <option value="ownership">Ownership</option>
+            <option value="nationality">Nationality</option>
+            {% endif %}
+        </select>
+    </div>
+    <div class="choice-container text-center top-bottom-space">
+        <label for="top_x">Top x managers: &nbsp</label>
+
+        <select name="top_x_list" id="top_x">
+            <option value={{top_x}} selected hidden>{{top_x}}</option>
+            <option value=10000>10000</option>
+            <option value=1000>1000</option>
+            <option value=100>100</option>
+            <option value=10>10</option>
+        </select>
+        <!--
+        Top x managers: &nbsp<input class="input-top-x" type="number" value={{top_x}} id="top_x">
+        -->
+        &nbsp&nbsp GW: &nbsp<input class="input-gw" type="number" min=1 max=38 value={{gw}} id="gw">
+        &nbsp<button type="button" id="button">Search</button>
+    </div>
+
+    <div class="choice-container text-center top-bottom-space img">
+    {% if ownership_vs_nationality == "nationality" %}
+        <script>
+            var gw = $("#gw").val();
+            var top_x = $("#top_x").val();
+            var ownership_vs_nationality = $("#ownership_vs_nationality").val();
+            var link = "<img class=" + '"' + "image-nationality" + '"' + "src=" + '"' + "/static/global_stats_map/" + ownership_vs_nationality + "/2019-20/" + top_x + "/nationalities_among_top_" + top_x + "_" + gw + ".png" + '">'
+            document.write(link);
+        </script>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,10 @@ from django.http import HttpResponse
 from django.views import generic
 from django.shortcuts import get_object_or_404
 import fixture_planner.read_data as read_data
+import fixture_planner.fixture_algorithms as alg
+import numpy as np
+from .forms import NameForm
+from django.template import RequestContext
 
 
 class FixturePlannerView(generic.ListView):
@@ -15,64 +19,175 @@ def fill_data_base(request):
     print(df)
     number_of_teams = len(names)
     for i in range(number_of_teams):
-        oppTeamNameList, oppTeamHomeAwayList, oppTeamDifficultyScore = [], [], []
+        oppTeamNameList, oppTeamHomeAwayList, oppTeamDifficultyScore, gw = [], [], [], []
         fill_model = AddPlTeamsToDB(team_name=names[i], team_id=ids[i], team_short_name=short_names[i])
         team_info = df.loc[i]
         for j in range(38):
-            gw_info_TEAM_HA_SCORE = team_info.iloc[j + 1]
-            oppTeamNameList.append(gw_info_TEAM_HA_SCORE[0])
-            oppTeamHomeAwayList.append(gw_info_TEAM_HA_SCORE[1])
-            oppTeamDifficultyScore.append(gw_info_TEAM_HA_SCORE[2])
+            gw_info_TEAM_HA_SCORE_GW = team_info.iloc[j + 1]
+            oppTeamNameList.append(gw_info_TEAM_HA_SCORE_GW[0])
+            oppTeamHomeAwayList.append(gw_info_TEAM_HA_SCORE_GW[1])
+            oppTeamDifficultyScore.append(gw_info_TEAM_HA_SCORE_GW[2])
+            gw.append(gw_info_TEAM_HA_SCORE_GW[3])
         fill_model = AddPlTeamsToDB(team_name=names[i], team_id=ids[i], team_short_name=short_names[i],
                                     oppTeamDifficultyScore=oppTeamDifficultyScore,
                                     oppTeamHomeAwayList=oppTeamHomeAwayList,
-                                    oppTeamNameList=oppTeamNameList)
+                                    oppTeamNameList=oppTeamNameList,
+                                    gw=gw)
         fill_model.save()
 
-    return HttpResponse("Hello World2")
+    return HttpResponse("Filled Database")
 
 
-def index2(request):
-    return HttpResponse("Hello World2")
 
 class team_info:
-    def __init__(self, opponent_team_name, difficulty_score, H_A, team_name):
+    def __init__(self, opponent_team_name, difficulty_score, H_A, team_name, FDR_score):
         ...
         self.opponent_team_name = opponent_team_name
         self.difficulty_score = difficulty_score
         self.H_A = H_A
         self.team_name = team_name
+        self.FDR_score = FDR_score
+        self.Use_Not_Use = 0
 
-def fixture_planner(request):
+def get_current_gw():
+    # find current gw
+    return 14
+
+def get_max_gw():
+    return 38
+
+class which_team_to_check:
+    def __init__(self, team_name, checked):
+        ...
+        self.team_name = team_name
+        self.checked = checked
+
+
+
+
+def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+7, combinations="FDR", teams_to_check=2, teams_to_play=1, min_num_fixtures=4):
     """View function for home page of site."""
     # Generate counts of some of the main objects
-    fixture_list = AddPlTeamsToDB.objects.all()
-    teams = len(fixture_list)
-    gws = len(fixture_list[0].oppTeamNameList)
-    gw_numbers = [i for i in range(38 - gws + 1, 38 + 1)]
-    fixture_list = [fixture_list[i] for i in range(0, teams)]
-    print(fixture_list)
-    print(fixture_list[0])
-    list = []
+    if end_gw > get_max_gw():
+        end_gw = get_max_gw()
+
+    fixture_list_db = AddPlTeamsToDB.objects.all()
+    team_name_list = []
+    team_dict = {}
+    teams = len(fixture_list_db)
     for i in range(teams):
-        temp_list = []
-        team_i = fixture_list[i]
-        for j in range(gws):
-            temp_list.append(team_info(team_i.oppTeamNameList[j],
-                                   team_i.oppTeamDifficultyScore[j],
-                                   team_i.oppTeamHomeAwayList[j],
-                                    team_i.team_name))
-        list.append(temp_list)
+        team_dict[fixture_list_db[i].team_name] = which_team_to_check(fixture_list_db[i].team_name, 'checked')
+
+    fixture_list = [fixture_list_db[i] for i in range(0, teams)]
+
+    if request.method == 'POST':
+        for i in range(teams):
+            team_dict[fixture_list[i].team_name] = which_team_to_check(fixture_list[i].team_name, '')
+
+        fpl_teams = request.POST.getlist('fpl-teams')
+        for fpl_team in fpl_teams:
+            team_dict[fpl_team] = which_team_to_check(team_dict[fpl_team].team_name, 'checked')
+        gw_info = request.POST.getlist('gw-info')
+        start_gw = int(gw_info[0])
+        end_gw = int(gw_info[1])
+        print(start_gw, end_gw, gw_info)
+    gws = end_gw - start_gw + 1
+    gw_numbers = [i for i in range(start_gw, end_gw + 1)]
+
+    fixture_list = []
+    for i in range(teams):
+        temp_object = team_dict[fixture_list_db[i].team_name]
+        team_name_list.append(team_dict[fixture_list_db[i].team_name])
+
+        if temp_object.checked == 'checked':
+            fixture_list.append(fixture_list_db[i])
+    print(fixture_list)
+    teams = len(fixture_list)
+
+
+    fdr_fixture_data = []
+    if combinations == 'FDR':
+        FDR_scores = []
+        for idx, i in enumerate(fixture_list):
+            sum = np.sum(i.oppTeamDifficultyScore[(start_gw - 1):end_gw])
+            FDR_scores.append([i, sum])
+        FDR_scores = sorted(FDR_scores, key=lambda x: x[1], reverse=False)
+
+        for i in range(teams):
+            temp_list2 = [[] for i in range(gws)]
+            team_i = FDR_scores[i][0]
+            FDR_score = FDR_scores[i][1]
+            temp_gws = team_i.gw
+            for j in range(len(team_i.gw)):
+                temp_gw = temp_gws[j]
+                if temp_gw in gw_numbers:
+                    temp_list2[gw_numbers.index(temp_gw)].append([
+                        team_info(team_i.oppTeamNameList[j],
+                                                   team_i.oppTeamDifficultyScore[j],
+                                                   team_i.oppTeamHomeAwayList[j],
+                                                   team_i.team_name,
+                                                   FDR_score)
+                    ])
+            for k in range(len(temp_list2)):
+                if not temp_list2[k]:
+                    temp_list2[k] = [[team_info("-", 0, " ", team_i.team_name, 0)]]
+
+            fdr_fixture_data.append(temp_list2)
+
+
+    rotation_data = []
+    if combinations == 'Rotation':
+        rotation_data = alg.find_best_rotation_combos2(start_gw, end_gw,
+                    teams_to_check=teams_to_check, teams_to_play=teams_to_play,
+                    team_names=[-1], teams_in_solution=[], teams_not_in_solution=[],
+                    top_teams_adjustment=False, one_double_up=False,
+                    home_away_adjustment=True, include_extra_good_games=False,
+                                    num_to_print=0)
+
+    if combinations == 'FDR-best':
+        fdr_fixture_data = alg.find_best_fixture_with_min_length_each_team(fixture_list, GW_start=start_gw, GW_end=end_gw, min_length=min_num_fixtures)
 
     context = {
-        'fixture_list': fixture_list,
         'teams': teams,
         'gws': gws,
         'gw_numbers': gw_numbers,
-        'list': list,
+        'gw_start': start_gw,
+        'gw_end': end_gw,
+        'combinations': combinations,
+        'rotation_data': rotation_data,
+        'teams_to_play': teams_to_play,
+        'teams_to_check': teams_to_check,
+        'fdr_fixture_data': fdr_fixture_data,
+        'min_num_fixtures': min_num_fixtures,
+        'team_name_list': team_name_list,
     }
-
     # Render the HTML template index_catalog.html with the data in the context variable
-    #return render(request, 'index_catalog.html', context=context)
     return render(request, 'fixture_planner_main.html', context=context)
 
+
+
+
+"""
+    list = []
+    for i in range(teams):
+        temp_list = []
+        team_i = FDR_scores[i][0]
+        FDR_score = FDR_scores[i][1]
+        for j in range(start_gw-1, end_gw):
+            gw = team_i.gw
+            if gw == 0:
+                temp_list.append(team_info(team_i.oppTeamNameList[j],
+                                           team_i.oppTeamDifficultyScore[j],
+                                           team_i.oppTeamHomeAwayList[j],
+                                           team_i.team_name,
+                                           FDR_score))
+            else:
+                temp_list.append(team_info(team_i.oppTeamNameList[j],
+                                   team_i.oppTeamDifficultyScore[j],
+                                   team_i.oppTeamHomeAwayList[j],
+                                    team_i.team_name,
+                                       FDR_score ))
+
+
+        list.append(temp_list)
+    """

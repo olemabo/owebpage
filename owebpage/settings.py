@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'contact',
     'catalog',
     'fixture_planner',
+    'statistic',
 ]
 
 MIDDLEWARE = [
