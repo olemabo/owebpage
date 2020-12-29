@@ -90,7 +90,10 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         gw_info = request.POST.getlist('gw-info')
         start_gw = int(gw_info[0])
         end_gw = int(gw_info[1])
-        print(start_gw, end_gw, gw_info)
+        combinations = request.POST.getlist('combination')[0]
+        min_num_fixtures = int(request.POST.getlist('min_num_fixtures')[0])
+        teams_to_check = int(request.POST.getlist('teams_to_check')[0])
+        teams_to_play = int(request.POST.getlist('teams_to_play')[0])
     gws = end_gw - start_gw + 1
     gw_numbers = [i for i in range(start_gw, end_gw + 1)]
 
@@ -101,7 +104,6 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
 
         if temp_object.checked == 'checked':
             fixture_list.append(fixture_list_db[i])
-    print(fixture_list)
     teams = len(fixture_list)
 
 
