@@ -91,9 +91,12 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         start_gw = int(gw_info[0])
         end_gw = int(gw_info[1])
         combinations = request.POST.getlist('combination')[0]
+        print(request.POST.getlist('min_num_fixtures'), request.POST.getlist('teams_to_check'),
+              request.POST.getlist('teams_to_check'))
         min_num_fixtures = int(request.POST.getlist('min_num_fixtures')[0])
         teams_to_check = int(request.POST.getlist('teams_to_check')[0])
         teams_to_play = int(request.POST.getlist('teams_to_play')[0])
+        print(min_num_fixtures, teams_to_check, teams_to_play)
     gws = end_gw - start_gw + 1
     gw_numbers = [i for i in range(start_gw, end_gw + 1)]
 

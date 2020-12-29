@@ -110,16 +110,22 @@ function hide() {
 
         {% if combinations == "FDR-best" %}
         <br>
-        Minimum fixtures: &nbsp<input type="number" min=1 max={{gws}} value={{min_num_fixtures}} id="min_num_fixtures2" name="min_num_fixtures">
+        Minimum fixtures: &nbsp<input type="number" min=1 max={{gws}} value={{min_num_fixtures}} id="min_num_fixtures" name="min_num_fixtures">
+        {% else %}
+        <input hidden type="number" min=1 max=38 value={{min_num_fixtures}} name="min_num_fixtures">
         {% endif %}
 
         {% if combinations == "Rotation" %}
         <br>
         Teams to check: &nbsp<input type="number" min=1 max=5 value={{teams_to_check}} id="teams_to_check" name="teams_to_check">
         Teams to play: &nbsp<input type="number" min=1 max=5 value={{teams_to_play}} id="teams_to_play" name="teams_to_play">
+        {% else %}
+        <input hidden type="number" min=1 max=5 value={{teams_to_check}} name="teams_to_check">
+        <input hidden type="number" min=1 max=5 value={{teams_to_play}} name="teams_to_play">
         {% endif %}
 
         <input hidden type="text" value={{combinations}} id="combination" name="combination">
+
         {% csrf_token %}
         <input class="update" type="submit" value="Search">
         <div id="which_teams_to_check">
