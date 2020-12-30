@@ -62,6 +62,7 @@ TEMPLATES = [
         'DIRS': [
                 os.path.join(BASE_DIR, 'templates'),
                 os.path.join(BASE_DIR, 'html'),
+                os.path.join(BASE_DIR, 'owebpage'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block title %}<title>Home Menu</title>{% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300,700|Varela+Round" rel="stylesheet">
+    <!-- Add additional CSS in static file -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home_styles2.css' %}">
+</head>
+<body>
+<!--h1>Welcome to this fpl web page</h1 -->
+<div>
+    <img class="header" src="{% static '/images/FPL-Statement-Lead.png' %}" alt="Top Image">
+</div>
+<div id="tops" class="top-nav">
+    <div class="container">
+        <a class="btn home" href=../../../home/>Home</a>
+        <a class="btn fixture" href=../../../fixture-planner/>Fixture Planner</a>
+        <a class="btn statistics" href=../../../statistics/>Statistics</a>
+        <a class="btn catalog" href=../../../catalog/>Catalog</a>
+        <a class="btn contact" href=../../../contact/>Contact</a>
+        <a class="btn admin" href=../../../admin/>Admin</a>
+    </div>
+    <!--DROPDOWN MENU: https://www.w3schools.com/css/tryit.asp?filename=trycss_dropdown_navbar -->
+</div>
+
+<script>
+    const homeBtn = document.getElementsByClassName("btn home")[0];
+    console.log(homeBtn);
+    homeBtn.classList.add("active");
+/*
+   // Get the container element
+var btnContainer = document.getElementById("tops");
+
+// Get all buttons with class="btn" inside the container
+var btns = btnContainer.getElementsByClassName("btn");
+
+// Loop through the buttons and add the active class to the current/clicked button
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function() {
+    var current = document.getElementsByClassName("btn");
+    current[0].className = current[0].className.replace("btn active", "btn");
+    this.className += " active";
+  });
+}
+*/
+</script>
+<div class="container-fluid" style="flex-wrap: wrap;">
+    <div class="row" style="width: 90%; justify-content: center;">
+        <!-- SIDEBAR div class="col-sm-2">
+        {% block sidebar %}
+          <ul class="sidebar-nav">
+            <li><a href=../home/>Home</a></li>
+            <li><a href=../contact/>Contact</a></li>
+            <li><a href=../catalog/>Catalog</a></li>
+              <li><a href=../admin/>Admin</a></li>
+          </ul>
+       {% endblock %}
+        </div -->
+        <div class="col-sm-10">{% block content %}{% endblock %}</div>
+            </div>
+        </div>
+        <footer>
+            Footer
+        </footer>
+</body>
+</html>
+

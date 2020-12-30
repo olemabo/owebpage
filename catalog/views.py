@@ -34,7 +34,5 @@ def index(request):
         'num_instances_available': num_instances_available,
         'num_authors': num_authors,
     }
-    print(Author.objects.all()[0].last_name)
-    print(Author.objects.all()[0].first_name)
     # Render the HTML template index_catalog.html with the data in the context variable
     return render(request, 'index.html', context=context)

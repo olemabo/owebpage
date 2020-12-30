@@ -1,4 +1,4 @@
-{% extends "index_home.html" %}
+{% extends "templates/owebpage/base.html" %}
 
 {% block content %}
   {% load static %}
@@ -6,6 +6,11 @@
 <script type="text/javascript" src="{% static 'js/fixture_planner.js' %}"></script>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script>
+    const statisticsBtn = document.getElementsByClassName("btn statistics")[0];
+    statisticsBtn.classList.add("active");
+</script>
 
 <script type="text/javascript">
 $(document).ready(function(){

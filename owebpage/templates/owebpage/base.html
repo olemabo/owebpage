@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block title %}<title>Home Menu</title>{% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300,700|Varela+Round" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home_styles2.css' %}">
+</head>
+<body>
+<section>
+    <div>
+        <img class="header" src="{% static '/images/FPL-Statement-Lead.png' %}" alt="Top Image">
+    </div>
+    <div id="tops" class="top-nav">
+        <div class="container">
+            <a class="btn home" href=../../../home/>Home</a>
+            <a class="btn fixture" href=../../../fixture-planner/>Fixture Planner</a>
+            <a class="btn statistics" href=../../../statistics/>Statistics</a>
+            <a class="btn catalog" href=../../../catalog/>Catalog</a>
+            <a class="btn contact" href=../../../contact/>Contact</a>
+            <a class="btn admin" href=../../../admin/>Admin</a>
+        </div>
+    </div>
+</section>
+
+<section>
+{% block content %}
+{% endblock %}
+</section>
+
+<section>
+    <div class="container-fluid" style="flex-wrap: wrap;">
+        <div class="row" style="width: 90%; justify-content: center;">
+            <div class="col-sm-10">{% block content1 %}{% endblock %}</div>
+        </div>
+    </div>
+    <footer>
+        Footer
+    </footer>
+</section>
+</body>
+
+</html>

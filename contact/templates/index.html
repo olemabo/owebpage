@@ -1,6 +1,11 @@
-{% extends "index_home.html" %}
+{% extends "templates/owebpage/base.html" %}
 
 {% block content %}
+    <script>
+    const statisticsBtn = document.getElementsByClassName("btn statistics")[0];
+    statisticsBtn.classList.add("active");
+    </script>
+
   <h2>Contact Page</h2>
   <p>Welcome to the contact page. This fpl page ... </p>
   {% load static %}

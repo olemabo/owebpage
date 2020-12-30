@@ -1,9 +1,15 @@
-{% extends "index_home.html" %}
+{% extends "templates/owebpage/base.html" %}
 
 {% block content %}
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/fixture_planner2.css' %}">
 <script type="text/javascript" src="{% static 'js/fixture_planner.js' %}"></script>
+
+<script>
+    const fixtureBtn = document.getElementsByClassName("btn fixture")[0];
+    console.log(fixtureBtn);
+    fixtureBtn.classList.add("active");
+</script>
 
 <h2>
     Fixture Difficult Rating
