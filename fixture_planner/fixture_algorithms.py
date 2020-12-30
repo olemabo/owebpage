@@ -660,7 +660,7 @@ def find_best_fixture_with_min_length_each_team(data, GW_start, GW_end, min_leng
     #df = adjust_df_for_home_away(df)
     #df = adjust_df_for_difficult_teams(df)
     best_fixtures_min_length = []
-    for team_id in range(return_number_of_premier_league_teams()):
+    for team_id in range(len(data)):
         info = compute_best_fixtures_one_team_db_data(data, GW_start, GW_end, team_id + 1, min_length)
         best_fixtures_min_length.append(info)
     return best_fixtures_min_length
@@ -705,6 +705,7 @@ def compute_best_fixtures_one_team_db_data(data, GW_start, GW_end, team_idx, min
     if min_length > (GW_end-GW_start+1):
         print('min_length: must be smaller than GW_end - GW_start + 1')
         return -1
+    print(team_idx, data[team_idx - 1], len(data))
     fdr_dict = create_FDR_dict(data[team_idx - 1])
     number_of_gameweeks = GW_end - GW_start + 1
     ii, jj, length = GW_start, GW_end, number_of_gameweeks

@@ -59,6 +59,17 @@ function hide() {
 }
 </script>
 
+<script>
+function hide2() {
+  var x = document.getElementById("which_teams_to_check2");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+</script>
+
 
 
 <form class="text-center">
@@ -87,38 +98,21 @@ function hide() {
 
 
 <div class="text-center">
-    <!--GW start: &nbsp<input type="number" min=1 max=38 value={{gw_start}} id="start_gw">
-    GW end: &nbsp<input type="number" min=1 max=38 value={{gw_end}} id="end_gw">
-    {% if combinations == "FDR-best" %}
-    <br>
-    Minimum fixtures: &nbsp<input type="number" min=1 max={{gws}} value={{min_num_fixtures}} id="min_num_fixtures">
-    {% endif %}
-    {% if combinations == "Rotation" %}
-    <br>
-     Teams to check: &nbsp<input type="number" min=1 max=5 value={{teams_to_check}} id="teams_to_check">
-    Teams to play: &nbsp<input type="number" min=1 max=5 value={{teams_to_play}} id="teams_to_play">
-    {% endif %}-->
-    <input hidden type="text" value={{combinations}} id="combinations">
-    <!--&nbsp<button type="button" id="button">Search</button>
-    <br -->
-</div>
-
-<div class="text-center">
     <form action="/fixture-planner/" method="post">
-        GW start: &nbsp<input type="number" min=1 max=38 value={{gw_start}} id="start_gw2" name="gw-info">
-        GW end: &nbsp<input type="number" min=1 max=38 value={{gw_end}} id="end_gw2" name="gw-info">
+        GW start: &nbsp<input class="box" type="number" min=1 max=38 value={{gw_start}} id="start_gw2" name="gw-info">
+        GW end: &nbsp<input class="box" type="number" min=1 max=38 value={{gw_end}} id="end_gw2" name="gw-info">
 
         {% if combinations == "FDR-best" %}
         <br>
-        Minimum fixtures: &nbsp<input type="number" min=1 max={{gws}} value={{min_num_fixtures}} id="min_num_fixtures" name="min_num_fixtures">
+        Minimum fixtures: &nbsp<input class="box" type="number" min=1 max={{gws}} value={{min_num_fixtures}} id="min_num_fixtures" name="min_num_fixtures">
         {% else %}
-        <input hidden type="number" min=1 max=38 value={{min_num_fixtures}} name="min_num_fixtures">
+        <input hidden class="box" type="number" min=1 max=38 value={{min_num_fixtures}} name="min_num_fixtures">
         {% endif %}
 
         {% if combinations == "Rotation" %}
         <br>
-        Teams to check: &nbsp<input type="number" min=1 max=5 value={{teams_to_check}} id="teams_to_check" name="teams_to_check">
-        Teams to play: &nbsp<input type="number" min=1 max=5 value={{teams_to_play}} id="teams_to_play" name="teams_to_play">
+        Teams to check: &nbsp<input class="box" type="number" min=1 max=5 value={{teams_to_check}} id="teams_to_check" name="teams_to_check">
+        Teams to play: &nbsp<input class="box" type="number" min=1 max=5 value={{teams_to_play}} id="teams_to_play" name="teams_to_play">
         {% else %}
         <input hidden type="number" min=1 max=5 value={{teams_to_check}} name="teams_to_check">
         <input hidden type="number" min=1 max=5 value={{teams_to_play}} name="teams_to_play">
@@ -136,50 +130,16 @@ function hide() {
                 <div>
                 {% endif %}
                 <input type="checkbox" id="{{team_name.team_name}}" value="{{team_name.team_name}}" name="fpl-teams" {{team_name.checked}}>
+                    {% if combinations == "Rotation" %}
+                        <input class="solution-box" type="checkbox" id="{{team_name.team_name}}-in-solution" value="{{team_name.team_name}}" name="fpl-teams-in-solution" {{team_name.checked_must_be_in_solution}}>
+                     {% endif %}
                 <label for="{{team_name.team_name}}">{{team_name.team_name}}</label>
             {% endfor %}
                 </div>
         </div>
     </form>
-        <button class="margin-top-bottom" onclick="hide()">Include teams in solution &#x2193</button>
-</div>
-
-
-<!--form action="/fixture-planner/" method="post">
-
-<div class="text-center">
     <button class="margin-top-bottom" onclick="hide()">Include teams in solution &#x2193</button>
-    <div id="which_teams_to_check">
-        <div>
-        {% for team_name in team_name_list %}
-         {% if forloop.counter|divisibleby:3 %}
-            </div>
-            <div>
-            {% endif %}
-            <input type="checkbox" id="{{team_name}}" name="{{team_name}}" checked>
-            <label for="{{team_name}}">{{team_name}}</label>
-        {% endfor %}
-            </div>
-    </div>
 </div>
-<br>
-
-<!--form action="/fixture-planner/" method="post">
-    {% csrf_token %}
-    <div id="which_teams_to_check">
-        <div>
-        {% for team_name in team_name_list %}
-         {% if forloop.counter|divisibleby:3 %}
-            </div>
-            <div>
-            {% endif %}
-            <input type="checkbox" id="{{team_name}}" value="{{team_name}}" name="fpl-teams" checked>
-            <label for="{{team_name}}">{{team_name}}</label>
-        {% endfor %}
-            </div>
-    </div>
-    <input type="submit" value="OK">
-</form -->
 
 
 
@@ -253,6 +213,7 @@ function hide() {
 
 
 {% if combinations == "Rotation" %}
+{% if rotation_data.0.0 != "Wrong input" %}
 <div class="big-container">
     <div class="container-rotation">
         <div>
@@ -291,12 +252,18 @@ function hide() {
                     </tbody>
                 </table>
                 <p>
-                    Avg. FDR score: <b>{{ data.0 }}</b>
+                    Avg. FDR score: <b>{{ data.0|floatformat:2 }}</b>
                 </p>
                 {% endfor %}
             </div>
         </div>
     </div>
+     {% else %}
+        <div style="text-align: center; font-weight: 800;">
+            <br>
+            Wrong Input
+        </div>
+            {% endif %}
 {% endif %}
 </div>
 {% endblock %}
@@ -430,3 +397,62 @@ function hide() {
     </div>
 </div>
 {% endif %}
+
+
+
+
+
+<!--form action="/fixture-planner/" method="post">
+
+<div class="text-center">
+    <button class="margin-top-bottom" onclick="hide()">Include teams in solution &#x2193</button>
+    <div id="which_teams_to_check">
+        <div>
+        {% for team_name in team_name_list %}
+         {% if forloop.counter|divisibleby:3 %}
+            </div>
+            <div>
+            {% endif %}
+            <input type="checkbox" id="{{team_name}}" name="{{team_name}}" checked>
+            <label for="{{team_name}}">{{team_name}}</label>
+        {% endfor %}
+            </div>
+    </div>
+</div>
+<br>
+
+<!--form action="/fixture-planner/" method="post">
+    {% csrf_token %}
+    <div id="which_teams_to_check">
+        <div>
+        {% for team_name in team_name_list %}
+         {% if forloop.counter|divisibleby:3 %}
+            </div>
+            <div>
+            {% endif %}
+            <input type="checkbox" id="{{team_name}}" value="{{team_name}}" name="fpl-teams" checked>
+            <label for="{{team_name}}">{{team_name}}</label>
+        {% endfor %}
+            </div>
+    </div>
+    <input type="submit" value="OK">
+</form -->
+
+
+<!--
+<div class="text-center">
+    GW start: &nbsp<input type="number" min=1 max=38 value={{gw_start}} id="start_gw">
+    GW end: &nbsp<input type="number" min=1 max=38 value={{gw_end}} id="end_gw">
+    {% if combinations == "FDR-best" %}
+    <br>
+    Minimum fixtures: &nbsp<input type="number" min=1 max={{gws}} value={{min_num_fixtures}} id="min_num_fixtures">
+    {% endif %}
+    {% if combinations == "Rotation" %}
+    <br>
+     Teams to check: &nbsp<input type="number" min=1 max=5 value={{teams_to_check}} id="teams_to_check">
+    Teams to play: &nbsp<input type="number" min=1 max=5 value={{teams_to_play}} id="teams_to_play">
+    {% endif %}
+    <input hidden type="text" value={{combinations}} id="combinations">-->
+    <!--&nbsp<button type="button" id="button">Search</button>
+    <br
+</div>-->

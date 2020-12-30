@@ -24,10 +24,65 @@ button.margin-top-bottom {
 
 input {
     text-align: left;
-    width: 50px;
+    width: 15px;
     margin-top: 3px;
     margin-bottom: 3px;
 }
+
+input.box {
+    width: 50px;
+}
+
+
+input[type=checkbox] {
+         position: relative;
+	       cursor: pointer;
+    }
+    input[type=checkbox]:before {
+         content: "";
+         display: block;
+         position: absolute;
+         width: 14px;
+         height: 14px;
+         top: 0;
+         left: 0;
+         background-color:none;
+}
+input[type=checkbox]:checked:before {
+         content: "";
+         display: block;
+         position: absolute;
+         width: 14px;
+         height: 14px;
+         top: 0;
+         left: 0;
+}
+
+input.solution-box[type=checkbox]:checked:before {
+         background-color:red;
+}
+input[type=checkbox]:checked:before {
+         background-color:#1E80EF;
+}
+
+
+    input[type=checkbox]:checked:after {
+         content: "";
+         display: block;
+         width: 4px;
+         height: 8px;
+         border: solid white;
+         border-width: 0 2px 2px 0;
+         -webkit-transform: rotate(45deg);
+         -ms-transform: rotate(45deg);
+         transform: rotate(45deg);
+         position: absolute;
+         top: 2px;
+         left: 5px;
+}
+
+
+
 
 #teams_to_check {
     margin-top: 3px;
