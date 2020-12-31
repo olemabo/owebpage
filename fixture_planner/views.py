@@ -51,7 +51,7 @@ class team_info:
 
 def get_current_gw():
     # find current gw
-    return 14
+    return 20
 
 def get_max_gw():
     return 38
@@ -112,7 +112,8 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
     if combinations == 'FDR':
         FDR_scores = []
         for idx, i in enumerate(fixture_list):
-            sum = np.sum(i.oppTeamDifficultyScore[(start_gw - 1):end_gw])
+            fdr_dict = alg.create_FDR_dict(i)
+            sum = alg.calc_score(fdr_dict, start_gw, end_gw)
             FDR_scores.append([i, sum])
         FDR_scores = sorted(FDR_scores, key=lambda x: x[1], reverse=False)
 
@@ -143,7 +144,6 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         teams_in_solution = []
         if request.method == 'POST':
             teams_in_solution = request.POST.getlist('fpl-teams-in-solution')
-        print(teams_in_solution, "J")
         remove_these_teams = []
         for team_sol in teams_in_solution:
             if team_sol not in fpl_teams:
@@ -160,7 +160,6 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
                     top_teams_adjustment=False, one_double_up=False,
                     home_away_adjustment=True, include_extra_good_games=False,
                                     num_to_print=0)
-        print(fpl_teams, teams_in_solution)
         if rotation_data == -1:
             rotation_data = [['Wrong input', [], [], 0, 0, [[]]]]
         else:

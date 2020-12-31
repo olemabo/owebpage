@@ -677,6 +677,7 @@ def create_FDR_dict(fdr_data, blank_score=10):
             new_dict[i] = [['-', ' ', blank_score]]
     return new_dict
 
+
 def calc_score(fdr_dict, gw_start, gw_end):
     score = 0
     for gw in range(gw_start, gw_end + 1):
