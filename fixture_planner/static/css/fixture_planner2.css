@@ -33,6 +33,9 @@ input.box {
     width: 50px;
 }
 
+.day_month {
+    font-size: 10px;
+}
 
 input[type=checkbox] {
          position: relative;

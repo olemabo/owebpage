@@ -57,6 +57,17 @@ class AddPlTeamsToDB(models.Model):
 
 
 
+class KickOffTime(models.Model):
+    gameweek = models.IntegerField(primary_key=True, help_text='Gameweek number')
+    kickoff_time = models.CharField(max_length=20, help_text="Kickoff time for given gameweek")
+    day_month = models.CharField(max_length=7, help_text="Kickoff time short version (12. jan)")
+
+    class Meta:
+        ordering = ['gameweek']
+
+    def __str__(self):
+        """String for representing the MyModelName object (in Admin site etc.)."""
+        return f'{self.gameweek}, {self.kickoff_time}'
 
 
 

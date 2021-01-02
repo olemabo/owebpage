@@ -200,5 +200,21 @@ def return_fixture_names_shortnames():
     return df, names, short_names, ids
 
 
-return_fixture_names_shortnames()
+def return_kickofftime():
+    with open('JSON_DATA/static.json') as json_fixture:
+        static = json.load(json_fixture)
+    kickofftime_info = []
+    number_of_gameweeks = len(static['events'])
+    month_dict = {'1': 'Jan', '2': "Feb", '3': 'Mar', '4': 'Apr', '5': 'May', '6': 'Jun', '7': 'Jul',
+                  '8': 'Aug', '9': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec'}
+    for gw in range(number_of_gameweeks):
+        gw_info = static['events'][gw]
+        kickofftime = gw_info['deadline_time']
+        month = int(kickofftime.split("-")[1])
+        day = str(kickofftime.split("T")[0].split("-")[2])
+        kickofftime_short = day + " " + month_dict[str(month)]
+        kickofftime_info.append([gw + 1, kickofftime, kickofftime_short])
+
+    return kickofftime_info
+
 

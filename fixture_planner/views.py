@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from fixture_planner.models import AddPlTeamsToDB
+from fixture_planner.models import AddPlTeamsToDB, KickOffTime
 from django.http import HttpResponse
 from django.views import generic
 from django.shortcuts import get_object_or_404
@@ -34,6 +34,10 @@ def fill_data_base(request):
                                     oppTeamNameList=oppTeamNameList,
                                     gw=gw)
         fill_model.save()
+    kickofftime_info = read_data.return_kickofftime()
+    for gw_info in kickofftime_info:
+        fill_model = KickOffTime(gameweek=gw_info[0], kickoff_time=gw_info[1], day_month=gw_info[2])
+        fill_model.save()
 
     return HttpResponse("Filled Database")
 
@@ -49,12 +53,15 @@ class team_info:
         self.FDR_score = FDR_score
         self.Use_Not_Use = 0
 
+
 def get_current_gw():
     # find current gw
     return 20
 
+
 def get_max_gw():
     return 38
+
 
 class which_team_to_check:
     def __init__(self, team_name, checked, checked_must_be_in_solution=''):
@@ -71,17 +78,18 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
     if end_gw > get_max_gw():
         end_gw = get_max_gw()
 
+    # collect data from database [[AddPlTeamsToDB], [AddPlTeamsToDB], ... ]
     fixture_list_db = AddPlTeamsToDB.objects.all()
     team_name_list = []
     team_dict = {}
-    teams = len(fixture_list_db)
-    for i in range(teams):
+    number_of_teams = len(fixture_list_db)
+    for i in range(number_of_teams):
         team_dict[fixture_list_db[i].team_name] = which_team_to_check(fixture_list_db[i].team_name, 'checked')
 
-    fixture_list = [fixture_list_db[i] for i in range(0, teams)]
+    fixture_list = [fixture_list_db[i] for i in range(0, number_of_teams)]
     fpl_teams = [-1]
     if request.method == 'POST':
-        for i in range(teams):
+        for i in range(number_of_teams):
             team_dict[fixture_list[i].team_name] = which_team_to_check(fixture_list[i].team_name, '')
 
         fpl_teams = request.POST.getlist('fpl-teams')
@@ -97,9 +105,9 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
 
     gws = end_gw - start_gw + 1
     gw_numbers = [i for i in range(start_gw, end_gw + 1)]
+    kickofftime_db = KickOffTime.objects.filter(gameweek__range=(start_gw, end_gw) )
 
-    fixture_list = []
-    for i in range(teams):
+    for i in range(number_of_teams):
         temp_object = team_dict[fixture_list_db[i].team_name]
         team_name_list.append(team_dict[fixture_list_db[i].team_name])
 
@@ -171,7 +179,7 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
     context = {
         'teams': teams,
         'gws': gws,
-        'gw_numbers': gw_numbers,
+        'gw_numbers': kickofftime_db,
         'gw_start': start_gw,
         'gw_end': end_gw,
         'combinations': combinations,
