@@ -107,6 +107,7 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
     gw_numbers = [i for i in range(start_gw, end_gw + 1)]
     kickofftime_db = KickOffTime.objects.filter(gameweek__range=(start_gw, end_gw) )
 
+    fixture_list = []
     for i in range(number_of_teams):
         temp_object = team_dict[fixture_list_db[i].team_name]
         team_name_list.append(team_dict[fixture_list_db[i].team_name])
@@ -114,7 +115,6 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         if temp_object.checked == 'checked':
             fixture_list.append(fixture_list_db[i])
     teams = len(fixture_list)
-
 
     fdr_fixture_data = []
     if combinations == 'FDR':
@@ -175,7 +175,7 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
 
     if combinations == 'FDR-best':
         fdr_fixture_data = alg.find_best_fixture_with_min_length_each_team(fixture_list, GW_start=start_gw, GW_end=end_gw, min_length=min_num_fixtures)
-
+    print(fdr_fixture_data, len(fdr_fixture_data), teams)
     context = {
         'teams': teams,
         'gws': gws,
