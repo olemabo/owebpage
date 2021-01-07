@@ -446,7 +446,8 @@ def two_D_list(row, col):
         twod_list.append(new)
     return twod_list
 
-def find_best_rotation_combos2(GW_start, GW_end, teams_to_check=5, teams_to_play=3, team_names=[-1],
+
+def find_best_rotation_combos2(data, GW_start, GW_end, teams_to_check=5, teams_to_play=3, team_names=[-1],
                               teams_in_solution=[], teams_not_in_solution=[],
                               top_teams_adjustment=False, one_double_up=False, home_away_adjustment=True,
                               include_extra_good_games=False, num_to_print=20):
@@ -463,6 +464,7 @@ def find_best_rotation_combos2(GW_start, GW_end, teams_to_check=5, teams_to_play
     :param num_to_print: how many of the best results to print to screen
     :return: combos_with_score [[score, [team_ids], [team_names]], ... ]   ([22.2, [1, 4, 11], ['Arsenal', 'Burnley', 'Liverpool']])
     """
+
     print("Teams to check: ", teams_to_check)
     print("Teams to play: ", teams_to_play)
     print("Double up from one team: ", one_double_up)
@@ -512,12 +514,16 @@ def find_best_rotation_combos2(GW_start, GW_end, teams_to_check=5, teams_to_play
     dict_team_id_to_home_away = {}
     dict_team_id_to_opponent = {}
 
+
     for idx, team_id in enumerate(team_ids):
         info = fixture_score_one_team(df, team_id, GW_start, GW_end)[3]
         info[info == 0] = 10
         dict_team_id_to_fixtures[team_id] = info
         dict_team_id_to_home_away[team_id] = fixture_score_one_team(df, team_id, GW_start, GW_end)[8]
         dict_team_id_to_opponent[team_id] = fixture_score_one_team(df, team_id, GW_start, GW_end)[2]
+
+
+
 
     dict_with_team_ids_to_team_name = create_dict_with_team_ids_to_team_name(static['teams'])
 
@@ -556,41 +562,79 @@ def find_best_rotation_combos2(GW_start, GW_end, teams_to_check=5, teams_to_play
 
 
     combos_with_score = []
+    combos_with_score_new = []
     for team_combos in unique_team_ids:
         # team_combos = [1, 3]
         team_total_score = 0
+        team_total_score_new = 0
         extra_fixtures = 0
         home_games = 0
-        two_D_lis = two_D_list(len(team_combos), number_of_GW)
+        #two_D_lis = two_D_list(len(team_combos), number_of_GW)
+        two_D_list_new = two_D_list(len(team_combos), number_of_GW)
+        print(team_combos, len(data))
         for GW_idx, GW in enumerate(range(number_of_GW)):
-            GW_home_scores = []
-            GW_scores = []
+            #GW_home_scores = []
+            GW_home_scores_new = []
+            #GW_scores = []
+            GW_scores_new = []
             for team_idx, team_id in enumerate(team_combos):
                 # team_id = 6
-                FDR = dict_team_id_to_fixtures[team_id][GW]
-                H_A = dict_team_id_to_home_away[team_id][GW]
-                Opponent = dict_team_id_to_opponent[team_id][GW]
+                #FDR = dict_team_id_to_fixtures[team_id][GW]
+                #H_A = dict_team_id_to_home_away[team_id][GW]
+                #Opponent = dict_team_id_to_opponent[team_id][GW]
                 team_name = dict_with_team_ids_to_team_name[team_id]
-                GW_home_scores.append([FDR, H_A])
-                GW_scores.append(FDR)
-                team_object = FDR_team(team_name, Opponent.upper(),
-                                       FDR, H_A, 0)
-                two_D_lis[team_idx][GW_idx] = team_object
+                #GW_home_scores.append([FDR, H_A])
+                #GW_scores.append(FDR)
+                #team_object = FDR_team(team_name, Opponent.upper(),
+                #                       FDR, H_A, 0)
+                #two_D_lis[team_idx][GW_idx] = team_object
 
-            Use_Not_Use_idx = np.array(GW_scores).argsort()[:teams_to_play]
+                temp_team_data_dict = create_FDR_dict(data[team_id - 1], 10)
+                data_gw = temp_team_data_dict[GW + GW_start]
+                gws_this_round = len(data_gw)
+                temp_score = 0
+                team_object_new = []
+                if gws_this_round > 1:
+                    for i in range(gws_this_round):
+                        temp_score += data_gw[i][2]
+                        team_object_new.append(FDR_team(team_name, data_gw[i][0].upper(),
+                                                        data_gw[i][2], data_gw[i][1], 0))
+                else:
+                    temp_score += data_gw[0][2]
+                    team_object_new.append(FDR_team(team_name, data_gw[0][0].upper(),
+                                           data_gw[0][2], data_gw[0][1], 0))
+                temp_score = temp_score / gws_this_round ** 2
+                GW_scores_new.append(temp_score)
+                two_D_list_new[team_idx][GW_idx] = team_object_new
+                H_A = 1
+                # fix this for later feature regarding h_a advantage
+                GW_home_scores_new.append([temp_score, H_A])
+
+            #Use_Not_Use_idx = np.array(GW_scores).argsort()[:teams_to_play]
+            #for k in Use_Not_Use_idx:
+            #    two_D_lis[k][GW_idx].Use_Not_Use = 1
+
+            Use_Not_Use_idx = np.array(GW_scores_new).argsort()[:teams_to_play]
             for k in Use_Not_Use_idx:
-                two_D_lis[k][GW_idx].Use_Not_Use = 1
+                two_D_list_new[k][GW_idx][0].Use_Not_Use = 1
+
+
+
             #print("Argsort: ", np.array(GW_scores).argsort()[:teams_to_play], GW_scores)
 
             # team_total_score += np.sum(sorted(GW_scores, key=float)[:teams_to_play])
-            sorted_scores = np.array(sorted(GW_home_scores, key=lambda l: l[0], reverse=False))
-            home_games += np.sum(sorted_scores[:teams_to_play, 1])
-            team_total_score += np.sum(sorted_scores[:teams_to_play, 0])
+            #sorted_scores = np.array(sorted(GW_home_scores, key=lambda l: l[0], reverse=False))
+            #home_games += np.sum(sorted_scores[:teams_to_play, 1])
+            #team_total_score += np.sum(sorted_scores[:teams_to_play, 0])
+
+            sorted_scores_new = np.array(sorted(GW_home_scores_new, key=lambda l: l[0], reverse=False))
+            team_total_score_new += np.sum(sorted_scores_new[:teams_to_play, 0])
+
             #print(team_combos, team_total_score, home_games, GW_home_scores, teams_to_play)
             # if there are more good games than
             if include_extra_good_games:
                 if teams_to_play < len(team_combos):
-                    extra_scores = sorted_scores[teams_to_play:, 0]
+                    extra_scores = sorted_scores_new[teams_to_play:, 0]
                     for extra_score in extra_scores:
                         if extra_score <= 2.9:
                             team_total_score -= 0.1
@@ -598,16 +642,21 @@ def find_best_rotation_combos2(GW_start, GW_end, teams_to_check=5, teams_to_play
 
         combo_names = []
         for team_id in team_combos:
-            combo_names.append(dict_with_team_ids_to_team_name[team_id]
-)
+            combo_names.append(dict_with_team_ids_to_team_name[team_id])
 
-        combos_with_score.append(
-            [round(team_total_score / number_of_GW / teams_to_play, 4), team_combos, combo_names, extra_fixtures,
-             home_games, two_D_lis])
+       # combos_with_score.append(
+        #    [round(team_total_score / number_of_GW / teams_to_play, 4), team_combos, combo_names, extra_fixtures,
+        #     home_games, two_D_lis])
+
+        combos_with_score_new.append(
+            [round(team_total_score_new / number_of_GW / teams_to_play, 4), team_combos, combo_names, extra_fixtures,
+             home_games, two_D_list_new])
         #print("HEHEH", combo_names, team_total_score)
-    #print(combos_with_score)
+
     # sort all the combos by the team_total_score. Best fixture will be first element and so on.
-    insertion_sort(combos_with_score, len(combos_with_score), element_to_sort=0, min_max="min")
+    #insertion_sort(combos_with_score, len(combos_with_score), element_to_sort=0, min_max="min")
+    insertion_sort(combos_with_score_new, len(combos_with_score_new), element_to_sort=0, min_max="min")
+
     print("\n\nRank \t Avg difficulty/game \t\t Teams")
     for idx, i in enumerate(combos_with_score[:num_to_print]):
         print(str(idx + 1) + "\t\t" + str(i[0]) + "\t\t" + str(', '.join(i[2])))
@@ -617,7 +666,7 @@ def find_best_rotation_combos2(GW_start, GW_end, teams_to_check=5, teams_to_play
     #    for TEAM in range(teams_to_check):
     #        ob = combos_with_score[0][-1][TEAM][GW]
     #        print("GW: ", GW_start + GW, ob.team_name, ob.FDR, ob.opponent_team_name_short, ob.Use_Not_Use)
-    return combos_with_score
+    return combos_with_score_new
 
 def return_number_of_premier_league_teams():
     # get number of premier league teams

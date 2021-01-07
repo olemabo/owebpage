@@ -216,7 +216,92 @@ function hide2() {
 {% endif %}
 
 
+
 {% if combinations == "Rotation" %}
+{% if rotation_data.0.0 != "Wrong input" %}
+<div class="big-container">
+    <div class="container-rotation">
+        <div>
+            <div>
+            {% for data in rotation_data %}
+                <!--div> Score: {{ data.0 }} </div-->
+                <table class="rotation">
+                    {% if forloop.counter != 1 %}
+                    {% endif %} <!-- remove this soon -->
+
+                    <tbody>
+                          <!-- remove this soon -->
+                            <tr>
+                                <th class="name-col-rotation"> Name </th>
+                                {% for gw_number in gw_numbers %}
+                                    <th class="min-width"> GW {{ gw_number.gameweek }}
+                                        <!--div class="day_month">
+                                            {{ gw_number.day_month }}
+                                        </div -->
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                            {% for FDR_team in data.5 %}
+                                     <tr>
+                                     {% for teams in FDR_team %}
+                                            {% if forloop.counter == 1 %}
+                                                    <td class="name-column min-width">
+                                                    {{ teams.0.team_name }}
+                                                    </td>
+                                            {% endif %}
+
+
+                                         {% if teams|length == 1 %}
+                                      <script>
+                                      document.write("<td scope='col' class=' min-width color-{{teams.0.difficulty_score}} double-border-{{teams.0.Use_Not_Use}}'>");
+                                      </script>
+                                      {% else %}
+                                       <script>
+                                     document.write("<td scope='col' class=' min-width no-padding double-border-{{teams.0.Use_Not_Use}}'>");
+                                       </script>
+                                      {% endif %}
+
+                                         {% for team in teams %}
+                                    <script>
+                                        document.write("<div class=' min-width color-{{team.difficulty_score}} multiple-fixtures height-{{ teams|length }}'>");
+                                    </script>
+                                      {% if team.opponent_team_name == '-' %}
+                                        Blank
+                                      {% else %}
+                                        {{  team.opponent_team_name }}&nbsp({{  team.H_A  }})
+                                      {% endif %}
+                                      </div>
+                                        {% endfor %}
+
+                                      </td>
+                                  {% endfor %}
+                                 </tr>
+                            {% endfor %}
+
+
+                    </tbody>
+                </table>
+                <p>
+                    Avg. FDR score: <b>{{ data.0|floatformat:2 }}</b>
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+     {% else %}
+        <div style="text-align: center; font-weight: 800;">
+            <br>
+            Wrong Input
+        </div>
+            {% endif %}
+{% endif %}
+</div>
+
+
+{% endblock %}
+
+
+{% if combinations == "Rotation_not_blank_DWG_correct" %}
 {% if rotation_data.0.0 != "Wrong input" %}
 <div class="big-container">
     <div class="container-rotation">
@@ -274,12 +359,6 @@ function hide2() {
             {% endif %}
 {% endif %}
 </div>
-{% endblock %}
-
-
-
-
-
 
 
 

@@ -283,7 +283,7 @@ th, td {
     display: inline-block;
     background-color: #EEE;
     border: 0px black solid;
-    height: 800px;
+    height: 1000px;
     overflow-y: scroll;
     flex-wrap: wrap;
     justify-content: center;

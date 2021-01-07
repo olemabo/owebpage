@@ -95,11 +95,19 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         fpl_teams = request.POST.getlist('fpl-teams')
         for fpl_team in fpl_teams:
             team_dict[fpl_team] = which_team_to_check(team_dict[fpl_team].team_name, 'checked')
+
+        # gameweek info
         gw_info = request.POST.getlist('gw-info')
         start_gw = int(gw_info[0])
         end_gw = int(gw_info[1])
+
+        if end_gw < start_gw:
+            end_gw = start_gw
+
         combinations = request.POST.getlist('combination')[0]
         min_num_fixtures = int(request.POST.getlist('min_num_fixtures')[0])
+        if min_num_fixtures > (end_gw-start_gw):
+            min_num_fixtures = end_gw - start_gw
         teams_to_check = int(request.POST.getlist('teams_to_check')[0])
         teams_to_play = int(request.POST.getlist('teams_to_play')[0])
 
@@ -161,8 +169,7 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         for i in team_name_list:
             if i.team_name in teams_in_solution:
                 i.checked_must_be_in_solution = 'checked'
-
-        rotation_data = alg.find_best_rotation_combos2(start_gw, end_gw,
+        rotation_data = alg.find_best_rotation_combos2(fixture_list_db, start_gw, end_gw,
                     teams_to_check=teams_to_check, teams_to_play=teams_to_play,
                     team_names=fpl_teams, teams_in_solution=teams_in_solution, teams_not_in_solution=[],
                     top_teams_adjustment=False, one_double_up=False,
@@ -175,7 +182,7 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
 
     if combinations == 'FDR-best':
         fdr_fixture_data = alg.find_best_fixture_with_min_length_each_team(fixture_list, GW_start=start_gw, GW_end=end_gw, min_length=min_num_fixtures)
-    print(fdr_fixture_data, len(fdr_fixture_data), teams)
+
     context = {
         'teams': teams,
         'gws': gws,
