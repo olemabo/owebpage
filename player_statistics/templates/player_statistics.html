@@ -1,0 +1,48 @@
+{% extends "index_home.html" %}
+
+{% block content %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/statistics2.css' %}">
+<script type="text/javascript" src="{% static 'js/fixture_planner.js' %}"></script>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script type="text/javascript">
+</script>
+
+<h2>
+    Player Statistics
+</h2>
+
+<div class="container-player-stats">
+    <table>
+    <thead>
+        <tr>
+            <th class="name-col">Name</th>
+            <th>Bps</th>
+            <th>ICT</th>
+            <th>I</th>
+            <th>C</th>
+            <th>T</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for player_i in player_info %}
+        <tr>
+            {% for attribute in player_i %}
+                {% if forloop.counter == 1 %}
+                    <td class="name-col"> {{ attribute }} </td>
+                {% else %}
+                    <td> {{ attribute }} </td>
+                 {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+
+
+{% endblock %}

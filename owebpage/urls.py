@@ -27,4 +27,5 @@ urlpatterns = [
     path('catalog/', include('catalog.urls')),
     path('statistics/', include('statistic.urls')),
     path('fixture-planner/', include('fixture_planner.urls')),
+    path('player_statistics/', include('player_statistics.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

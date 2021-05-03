@@ -2,13 +2,10 @@ from django.shortcuts import render
 from fixture_planner.models import AddPlTeamsToDB, KickOffTime
 from django.http import HttpResponse
 from django.views import generic
-from django.shortcuts import get_object_or_404
 import fixture_planner.read_data as read_data
 import fixture_planner.fixture_algorithms as alg
-import numpy as np
-from .forms import NameForm
-from django.template import RequestContext
-
+from datetime import date
+import statistic.calculate_statistics as stat
 
 class FixturePlannerView(generic.ListView):
     model = AddPlTeamsToDB
@@ -16,7 +13,6 @@ class FixturePlannerView(generic.ListView):
 
 def fill_data_base(request):
     df, names, short_names, ids = read_data.return_fixture_names_shortnames()
-    print(df)
     number_of_teams = len(names)
     for i in range(number_of_teams):
         oppTeamNameList, oppTeamHomeAwayList, oppTeamDifficultyScore, gw = [], [], [], []
@@ -38,9 +34,8 @@ def fill_data_base(request):
     for gw_info in kickofftime_info:
         fill_model = KickOffTime(gameweek=gw_info[0], kickoff_time=gw_info[1], day_month=gw_info[2])
         fill_model.save()
-
+    stat.fill_database_all_players()
     return HttpResponse("Filled Database")
-
 
 
 class team_info:
@@ -56,7 +51,15 @@ class team_info:
 
 def get_current_gw():
     # find current gw
-    return 20
+    today_date = date.today()
+    kickofftime_db = KickOffTime.objects.filter(gameweek__range=(0, 38))
+    for i in range(len(kickofftime_db)):
+        current_gw = i + 1
+        dates = kickofftime_db[i].kickoff_time.split("T")[0].split("-")
+        gw_i_date = date(int(dates[0]), int(dates[1]), int(dates[2]))
+        if gw_i_date > today_date:
+            return current_gw
+    return 0
 
 
 def get_max_gw():
@@ -72,7 +75,7 @@ class which_team_to_check:
 
 
 
-def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+7, combinations="FDR", teams_to_check=2, teams_to_play=1, min_num_fixtures=4):
+def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+5, combinations="FDR", teams_to_check=2, teams_to_play=1, min_num_fixtures=4):
     """View function for home page of site."""
     # Generate counts of some of the main objects
     if end_gw > get_max_gw():
@@ -101,19 +104,18 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         start_gw = int(gw_info[0])
         end_gw = int(gw_info[1])
 
-        if end_gw < start_gw:
-            end_gw = start_gw
-
         combinations = request.POST.getlist('combination')[0]
         min_num_fixtures = int(request.POST.getlist('min_num_fixtures')[0])
-        if min_num_fixtures > (end_gw-start_gw):
-            min_num_fixtures = end_gw - start_gw
+
         teams_to_check = int(request.POST.getlist('teams_to_check')[0])
         teams_to_play = int(request.POST.getlist('teams_to_play')[0])
 
+    if end_gw < start_gw:
+          end_gw = start_gw + 1
+
     gws = end_gw - start_gw + 1
     gw_numbers = [i for i in range(start_gw, end_gw + 1)]
-    kickofftime_db = KickOffTime.objects.filter(gameweek__range=(start_gw, end_gw) )
+    kickofftime_db = KickOffTime.objects.filter(gameweek__range=(start_gw, end_gw))
 
     fixture_list = []
     for i in range(number_of_teams):
@@ -180,8 +182,14 @@ def fixture_planner(request, start_gw=get_current_gw(), end_gw=get_current_gw()+
         else:
             rotation_data = rotation_data[:(min(len(rotation_data), 50))]
 
+    if abs(min_num_fixtures) > (end_gw-start_gw):
+            min_num_fixtures = abs(end_gw-start_gw)
+            if min_num_fixtures == 0:
+                min_num_fixtures = 1
+                end_gw = start_gw + 1
     if combinations == 'FDR-best':
         fdr_fixture_data = alg.find_best_fixture_with_min_length_each_team(fixture_list, GW_start=start_gw, GW_end=end_gw, min_length=min_num_fixtures)
+
 
     context = {
         'teams': teams,

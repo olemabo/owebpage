@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'catalog',
     'fixture_planner',
     'statistic',
+    'player_statistics',
 ]
 
 MIDDLEWARE = [
